@@ -1,4 +1,4 @@
-package main
+package calc
 
 import (
 	"fmt"
@@ -65,7 +65,7 @@ func Calc(expression string) (float64, error) {
 			}
 		}
 
-		tf, err = FindErrors(begstap[bc], endstap[bc], exp, stap)
+		tf, err = findErrors(begstap[bc], endstap[bc], exp, stap)
 		if tf {
 			return 0, err
 		}
@@ -140,7 +140,7 @@ func Calc(expression string) (float64, error) {
 
 	//ВЫРАЖЕНИЕ!!!!!!!!!!/////////////////////////////////////////
 
-	tf, err = FindErrors(0, 0, exp, stap)
+	tf, err = findErrors(0, 0, exp, stap)
 	if tf {
 		return 0, err
 	}
@@ -162,6 +162,7 @@ func Calc(expression string) (float64, error) {
 				exp = exp[:len(exp)-2]
 				multdiv--
 				i = 0
+
 			} else if exp[i] == "*" {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
@@ -172,6 +173,7 @@ func Calc(expression string) (float64, error) {
 				exp = exp[:len(exp)-2]
 				multdiv--
 				i = 0
+
 			} else if exp[i] == "-" && multdiv == 0 {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
@@ -181,6 +183,7 @@ func Calc(expression string) (float64, error) {
 				copy(exp[i:], exp[i+1:])
 				exp = exp[:len(exp)-2]
 				i = 0
+
 			} else if exp[i] == "+" && multdiv == 0 {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
@@ -193,15 +196,11 @@ func Calc(expression string) (float64, error) {
 			}
 		}
 	}
+
 	a, _ = strconv.ParseFloat(exp[0], 64)
 	return a, nil
 }
-func main() {
-	var expression string
-	fmt.Scanln(&expression)
-	fmt.Println(Calc(expression))
-}
-func FindErrors(begstap, endstap int, exp, stap []string) (bool, error) {
+func findErrors(begstap, endstap int, exp, stap []string) (bool, error) {
 	for i := 0; i < len(exp); i++ {
 		if i == len(exp)-1 {
 			if exp[i] == "/" || exp[i] == "*" || exp[i] == "+" || exp[i] == "-" || exp[i] == "(" {
