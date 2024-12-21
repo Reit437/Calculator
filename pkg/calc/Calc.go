@@ -7,13 +7,13 @@ import (
 
 func Calc(expression string) (float64, error) {
 	var (
-		numb             string
-		exp, stap        []string
-		multdiv, bc      int
-		endstap, begstap []int
-		tf               bool
-		err              error
-		a, f             float64
+		numb                    string
+		exp, stap               []string
+		multdiv, staples, trash int
+		endstap, begstap        []int
+		tf                      bool
+		err                     error
+		a, f                    float64
 	)
 
 	for i := 0; i < len(expression); i++ {
@@ -44,7 +44,6 @@ func Calc(expression string) (float64, error) {
 	}
 
 	/////////СКОБКИ!!!!!!!!////////////////////////////////////////////////////////////////////////////
-
 	for i := 0; i < len(exp); i++ {
 		if exp[i] == "(" {
 			begstap = append(begstap, i)
@@ -52,95 +51,98 @@ func Calc(expression string) (float64, error) {
 			endstap = append(endstap, i)
 		}
 	}
-
-	for bc != len(begstap) {
+	for staples != len(begstap) {
 		if len(begstap) != 0 {
-			stap = exp[begstap[bc]+1 : endstap[bc]]
-			fmt.Println(stap, begstap, endstap, exp)
+			stap = exp[begstap[staples]+1 : endstap[staples]]
 		}
 
 		for i := 0; i < len(stap); i++ {
 			if stap[i] == "/" || stap[i] == "*" {
 				multdiv++
 			}
-		}
-
-		tf, err = findErrors(begstap[bc], endstap[bc], exp, stap)
-		if tf {
-			return 0, err
-		}
-	}
-	for len(stap) > 1 {
-
-		if len(stap) == 0 {
-			break
-		}
-
-		for i := 0; i < len(stap); i++ {
-			if stap[i] == "/" {
-				a, _ = strconv.ParseFloat(stap[i-1], 64)
-				f, _ = strconv.ParseFloat(stap[i+1], 64)
-				numb = strconv.FormatFloat(float64(a)/float64(f), 'f', 3, 64)
-				stap[i-1] = numb
-				copy(stap[i+1:], stap[i+2:])
-				copy(stap[i:], stap[i+1:])
-				stap = stap[:len(stap)-2]
-				multdiv--
-				i = 0
-
-			} else if stap[i] == "*" {
-				a, _ = strconv.ParseFloat(stap[i-1], 64)
-				f, _ = strconv.ParseFloat(stap[i+1], 64)
-				numb = strconv.FormatFloat(float64(a)*float64(f), 'f', 3, 64)
-				stap[i-1] = numb
-				copy(stap[i+1:], stap[i+2:])
-				copy(stap[i:], stap[i+1:])
-				stap = stap[:len(stap)-2]
-				multdiv--
-				i = 0
-
-			} else if stap[i] == "-" && multdiv == 0 {
-				a, _ = strconv.ParseFloat(stap[i-1], 64)
-				f, _ = strconv.ParseFloat(stap[i+1], 64)
-				numb = strconv.FormatFloat(float64(a)-float64(f), 'f', 3, 64)
-				stap[i-1] = numb
-				copy(stap[i+1:], stap[i+2:])
-				copy(stap[i:], stap[i+1:])
-				stap = stap[:len(stap)-2]
-				i = 0
-
-			} else if stap[i] == "+" && multdiv == 0 {
-				a, _ = strconv.ParseFloat(stap[i-1], 64)
-				f, _ = strconv.ParseFloat(stap[i+1], 64)
-				numb = strconv.FormatFloat(float64(a)+float64(f), 'f', 3, 64)
-				stap[i-1] = numb
-				copy(stap[i+1:], stap[i+2:])
-				copy(stap[i:], stap[i+1:])
-				stap = stap[:len(stap)-2]
-				i = 0
+			tf, err = findErrors(exp, stap)
+			if tf {
+				return 0, err
 			}
 		}
-		if len(stap) > 0 {
-			copy(exp[begstap[bc]+2:], exp[endstap[bc]+1:])
-			copy(exp[begstap[bc]:], exp[begstap[bc]+1:])
-			exp = exp[:len(exp)-(endstap[bc]-begstap[bc])]
-		}
+		for len(stap) > 1 {
+			if len(stap) == 0 {
+				break
+			}
+			for i := 0; i < len(stap); i++ {
+				if stap[i] == "/" {
+					a, _ = strconv.ParseFloat(stap[i-1], 64)
+					f, _ = strconv.ParseFloat(stap[i+1], 64)
+					numb = strconv.FormatFloat(float64(a)/float64(f), 'f', 3, 64)
+					stap[i-1] = numb
+					multdiv--
+					trash++
 
-		if exp[len(exp)-1] == " " || exp[len(exp)-1] == "" {
-			exp = exp[:len(exp)-1]
-		}
-		bc++
-		if bc < len(begstap) {
-			if begstap[bc]-4 > 0 {
-				endstap[bc] = endstap[bc] - 4
-				begstap[bc] = begstap[bc] - 4
+				} else if stap[i] == "*" {
+					a, _ = strconv.ParseFloat(stap[i-1], 64)
+					f, _ = strconv.ParseFloat(stap[i+1], 64)
+					numb = strconv.FormatFloat(float64(a)*float64(f), 'f', 3, 64)
+					stap[i-1] = numb
+					multdiv--
+					trash++
+
+				} else if stap[i] == "-" && multdiv == 0 {
+					a, _ = strconv.ParseFloat(stap[i-1], 64)
+					f, _ = strconv.ParseFloat(stap[i+1], 64)
+					numb = strconv.FormatFloat(float64(a)-float64(f), 'f', 3, 64)
+					stap[i-1] = numb
+					trash++
+
+				} else if stap[i] == "+" && multdiv == 0 {
+					a, _ = strconv.ParseFloat(stap[i-1], 64)
+					f, _ = strconv.ParseFloat(stap[i+1], 64)
+					numb = strconv.FormatFloat(float64(a)+float64(f), 'f', 3, 64)
+					stap[i-1] = numb
+					trash++
+				}
+
+				if i >= 1 {
+					if stap[i-1] == numb {
+						copy(stap[i+1:], stap[i+2:])
+						copy(stap[i:], stap[i+1:])
+						stap = stap[:len(stap)-2]
+						numb = ""
+					}
+				}
+
+				if trash == 1 {
+					i = 0
+					trash = 0
+				}
+			}
+
+			if len(stap) > 0 {
+				copy(exp[begstap[staples]+2:], exp[endstap[staples]+1:])
+				copy(exp[begstap[staples]:], exp[begstap[staples]+1:])
+				exp = exp[:len(exp)-(endstap[staples]-begstap[staples])]
+			}
+
+			if exp[len(exp)-1] == " " || exp[len(exp)-1] == "" {
+				exp = exp[:len(exp)-1]
+			}
+
+			staples++
+
+			if staples < len(begstap) {
+				if begstap[staples]-4 > 0 {
+					for i := 0; i < len(begstap); i++ {
+						endstap[i] -= 4
+						begstap[i] -= 4
+						if begstap[i] < 0 {
+							begstap[i] = 0
+						}
+					}
+				}
 			}
 		}
 	}
-
 	//ВЫРАЖЕНИЕ!!!!!!!!!!/////////////////////////////////////////
-
-	tf, err = findErrors(0, 0, exp, stap)
+	tf, err = findErrors(exp, stap)
 	if tf {
 		return 0, err
 	}
@@ -151,48 +153,51 @@ func Calc(expression string) (float64, error) {
 		}
 	}
 	for len(exp) > 1 {
+
 		for i := 0; i < len(exp); i++ {
+
 			if exp[i] == "/" {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
 				numb = strconv.FormatFloat(float64(a)/float64(f), 'f', 3, 64)
 				exp[i-1] = numb
-				copy(exp[i+1:], exp[i+2:])
-				copy(exp[i:], exp[i+1:])
-				exp = exp[:len(exp)-2]
 				multdiv--
-				i = 0
+				trash++
 
 			} else if exp[i] == "*" {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
 				numb = strconv.FormatFloat(float64(a)*float64(f), 'f', 3, 64)
 				exp[i-1] = numb
-				copy(exp[i+1:], exp[i+2:])
-				copy(exp[i:], exp[i+1:])
-				exp = exp[:len(exp)-2]
 				multdiv--
-				i = 0
+				trash++
 
 			} else if exp[i] == "-" && multdiv == 0 {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
 				numb = strconv.FormatFloat(float64(a)-float64(f), 'f', 3, 64)
 				exp[i-1] = numb
-				copy(exp[i+1:], exp[i+2:])
-				copy(exp[i:], exp[i+1:])
-				exp = exp[:len(exp)-2]
-				i = 0
+				trash++
 
 			} else if exp[i] == "+" && multdiv == 0 {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
 				numb = strconv.FormatFloat(float64(a)+float64(f), 'f', 3, 64)
 				exp[i-1] = numb
-				copy(exp[i+1:], exp[i+2:])
-				copy(exp[i:], exp[i+1:])
-				exp = exp[:len(exp)-2]
+				trash++
+			}
+
+			if i >= 1 {
+				if exp[i-1] == numb {
+					copy(exp[i+1:], exp[i+2:])
+					copy(exp[i:], exp[i+1:])
+					exp = exp[:len(exp)-2]
+				}
+			}
+
+			if trash == 1 {
 				i = 0
+				trash = 0
 			}
 		}
 	}
@@ -200,7 +205,8 @@ func Calc(expression string) (float64, error) {
 	a, _ = strconv.ParseFloat(exp[0], 64)
 	return a, nil
 }
-func findErrors(begstap, endstap int, exp, stap []string) (bool, error) {
+
+func findErrors(exp, stap []string) (bool, error) {
 	for i := 0; i < len(exp); i++ {
 		if i == len(exp)-1 {
 			if exp[i] == "/" || exp[i] == "*" || exp[i] == "+" || exp[i] == "-" || exp[i] == "(" {

@@ -21,7 +21,7 @@ type ErrorResponse struct {
 }
 
 func isValidExpression(expression string) bool {
-	matched, err := regexp.MatchString(`^[d+\-*/().]+$`, expression)
+	matched, err := regexp.MatchString(`^[\d+\-*/().]+$`, expression)
 	if err != nil {
 		return false
 	}
@@ -39,19 +39,19 @@ func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 	if !isValidExpression(req.Expression) {
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		errResp := ErrorResponse{Error: "Expression is not valid"}
-		w.Write([]byte("Invalid"))
 		json.NewEncoder(w).Encode(errResp)
 		return
 	}
 
-	result, _ := calc.Calc(req.Expression)
+	result, err := calc.Calc(req.Expression)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		errResp := ErrorResponse{Error: err.Error()}
 		json.NewEncoder(w).Encode(errResp)
 		return
 	}
-	w.WriteHeader(http.StatusBadRequest)
+
 	resp := CalculateResponse{Result: result}
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 }

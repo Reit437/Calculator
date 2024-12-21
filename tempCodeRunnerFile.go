@@ -1,2 +1,1 @@
-
-	"net/http"
+curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"(1+1)+1\"}" "http://localhost:8080/api/v1/calculate"
