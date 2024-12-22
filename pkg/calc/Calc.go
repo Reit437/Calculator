@@ -29,7 +29,7 @@ func Calc(expression string) (float64, error) {
 	}
 
 	exp = append(exp, numb)
-
+	numb = ""
 	if len(exp) <= 1 {
 		if len(exp) == 0 {
 			return 0, fmt.Errorf("empty string")
@@ -61,7 +61,7 @@ func Calc(expression string) (float64, error) {
 			if stap[i] == "/" || stap[i] == "*" {
 				multdiv++
 			}
-			tf, err = findErrors(exp, stap)
+			tf, err = findErrors(exp)
 
 			if tf {
 				return 0, err
@@ -145,7 +145,7 @@ func Calc(expression string) (float64, error) {
 		}
 	}
 	//ВЫРАЖЕНИЕ!!!!!!!!!!/////////////////////////////////////////
-	tf, err = findErrors(exp, stap)
+	tf, err = findErrors(exp)
 	if tf {
 		return 0, err
 	}
@@ -190,10 +190,12 @@ func Calc(expression string) (float64, error) {
 			}
 
 			if i >= 1 {
+				fmt.Println(numb)
 				if exp[i-1] == numb {
 					copy(exp[i+1:], exp[i+2:])
 					copy(exp[i:], exp[i+1:])
 					exp = exp[:len(exp)-2]
+					numb = ""
 				}
 			}
 
@@ -207,8 +209,7 @@ func Calc(expression string) (float64, error) {
 	a, _ = strconv.ParseFloat(exp[0], 64)
 	return a, nil
 }
-
-func findErrors(exp, stap []string) (bool, error) {
+func findErrors(exp []string) (bool, error) {
 
 	for i := 0; i < len(exp); i++ {
 		if i == 0 {

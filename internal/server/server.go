@@ -18,6 +18,7 @@ type CalculateResponse struct {
 
 type ErrorResponse struct {
 	Error string `json:"error"`
+	Code  int    `json:"code"`
 }
 
 func isValidExpression(expression string) bool {
@@ -38,7 +39,7 @@ func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 
 	if !isValidExpression(req.Expression) {
 		w.WriteHeader(http.StatusUnprocessableEntity)
-		errResp := ErrorResponse{Error: "Expression is not valid"}
+		errResp := ErrorResponse{Error: "Expression is not valid", Code: http.StatusUnprocessableEntity}
 		json.NewEncoder(w).Encode(errResp)
 		return
 	}
@@ -46,7 +47,7 @@ func CalculateHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := calc.Calc(req.Expression)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		errResp := ErrorResponse{Error: err.Error()}
+		errResp := ErrorResponse{Error: err.Error(), Code: http.StatusInternalServerError}
 		json.NewEncoder(w).Encode(errResp)
 		return
 	}
