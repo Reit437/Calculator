@@ -8,7 +8,7 @@
 ------Инструкция по запуску
 
 1. Запустить файл main.go(Важно! Вы должны быть в директории ./Calculator)
-2. Ввести в терминал(cmd) команду с вашим выражением: curl -X POST -H "Content-Type: application/json" -d "{\"expression\":\"YOUR EXPRESSION\"}" http://localhost:8080/api/v1/calculate(Важно! Знак "\" после вашего выражения убирать нельзя)
+2. Ввести в терминал(cmd) команду с вашим выражением: curl -X POST -H "Content-Type: application/json" -d "{\"expression\":\"YOUR EXPRESSION\"}" http://localhost:8080/api/v1/calculate (Важно! Знак "\" после вашего выражения убирать нельзя)
 3. Просмотреть ответ и код ошибки, если она есть
 
 ГОТОВО!
