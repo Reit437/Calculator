@@ -15,4 +15,4 @@ func main() {
 }
 
 //(Invoke-WebRequest -Method Post -Uri "http://localhost:8080/api/v1/calculate" -Headers @{"Content-Type"="application/json"} -Body '{"expression":"80*9/f75/2"}').Content
-//curl -X POST -H "Content-Type: application/json" -d "{\"expression\": \"+(100/54-656+59*58)\"}" "http://localhost:8080/api/v1/calculate"
+//curl -X POST -H "Content-Type: application/json" -d "{\"expression\":\"1+1+1+1+1+\"}" http://localhost:8080/api/v1/calculate

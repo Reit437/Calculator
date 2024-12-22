@@ -32,11 +32,11 @@ func Calc(expression string) (float64, error) {
 
 	if len(exp) <= 1 {
 		if len(exp) == 0 {
-			return 0, fmt.Errorf("Empty string")
+			return 0, fmt.Errorf("empty string")
 		} else {
 			a, err := strconv.ParseFloat(string(exp[0]), 64)
 			if err != nil {
-				return 0, fmt.Errorf("Error in writing")
+				return 0, fmt.Errorf("strange expression")
 			} else {
 				return a, nil
 			}
@@ -51,6 +51,7 @@ func Calc(expression string) (float64, error) {
 			endstap = append(endstap, i)
 		}
 	}
+
 	for staples != len(begstap) {
 		if len(begstap) != 0 {
 			stap = exp[begstap[staples]+1 : endstap[staples]]
@@ -61,14 +62,17 @@ func Calc(expression string) (float64, error) {
 				multdiv++
 			}
 			tf, err = findErrors(exp, stap)
+
 			if tf {
 				return 0, err
 			}
 		}
+
 		for len(stap) > 1 {
 			if len(stap) == 0 {
 				break
 			}
+
 			for i := 0; i < len(stap); i++ {
 				if stap[i] == "/" {
 					a, _ = strconv.ParseFloat(stap[i-1], 64)
@@ -125,7 +129,6 @@ func Calc(expression string) (float64, error) {
 			if exp[len(exp)-1] == " " || exp[len(exp)-1] == "" {
 				exp = exp[:len(exp)-1]
 			}
-
 			staples++
 
 			if staples < len(begstap) {
@@ -152,10 +155,9 @@ func Calc(expression string) (float64, error) {
 			multdiv++
 		}
 	}
+
 	for len(exp) > 1 {
-
 		for i := 0; i < len(exp); i++ {
-
 			if exp[i] == "/" {
 				a, _ = strconv.ParseFloat(exp[i-1], 64)
 				f, _ = strconv.ParseFloat(exp[i+1], 64)
@@ -207,51 +209,64 @@ func Calc(expression string) (float64, error) {
 }
 
 func findErrors(exp, stap []string) (bool, error) {
+
 	for i := 0; i < len(exp); i++ {
+		if i == 0 {
+			if (exp[i] < "0" || exp[i] > "9") && exp[i] != "(" {
+				return true, fmt.Errorf("error in writing, the sign at the beginning")
+			}
+
+		}
+
 		if i == len(exp)-1 {
 			if exp[i] == "/" || exp[i] == "*" || exp[i] == "+" || exp[i] == "-" || exp[i] == "(" {
-				return true, fmt.Errorf("Error in writing")
+				return true, fmt.Errorf("error in writing, the sign at the end")
 			} else {
 				if (exp[i] == ")") && (exp[i-1] == "*" || exp[i-1] == "(" || exp[i-1] == "+" || exp[i-1] == "-" || exp[i-1] == "/") {
-					return true, fmt.Errorf("Error in writing znack")
+					return true, fmt.Errorf("error in writing, sign before staple")
 				} else {
 					return false, fmt.Errorf("Good")
 				}
 			}
 		}
+
 		if i == 0 {
 			if exp[i] == "(" {
 				if exp[i+1] == "+" || exp[i+1] == "-" || exp[i+1] == "*" || exp[i+1] == "/" || exp[i+1] == ")" {
-					return true, fmt.Errorf("Error in writing zn after scobs")
+					return true, fmt.Errorf("error in writing, sign after staple")
 				} else {
 					i++
 				}
 			}
 		}
+
 		if exp[i] == "/" || exp[i] == "*" || exp[i] == "+" || exp[i] == "-" {
 			if exp[i+1] == "(" || exp[i-1] == ")" {
 				continue
 			}
 			_, a := strconv.ParseFloat(exp[i+1], 64)
-			_, endstap := strconv.ParseFloat(exp[i-1], 64)
+			_, b := strconv.ParseFloat(exp[i-1], 64)
+
 			if exp[i+1] == "(" || exp[i] == "(" {
 				if exp[i+1] == "(" {
-					if endstap != nil {
-						return true, fmt.Errorf("Error in writing scobs")
+					if b != nil {
+						return true, fmt.Errorf("error in writing, staples")
 					}
 				} else if exp[i] == "(" {
-					if a != nil || endstap == nil {
-						return true, fmt.Errorf("Error in writing scobs")
+					if a != nil || b == nil {
+						return true, fmt.Errorf("error in writing, staples")
 					}
 				}
 				continue
 			}
-			if a != nil || endstap != nil {
-				return true, fmt.Errorf("Error in writing")
+
+			if a != nil || b != nil {
+				return true, fmt.Errorf("error in writing, incorrect symbol after/before sign")
 			}
+
 			if exp[i] == "/" {
 				if exp[i+1] == "0" {
-					return true, fmt.Errorf("Divide by zero")
+					return true, fmt.Errorf("divide by zero")
 				}
 			}
 		}
